@@ -1,0 +1,64 @@
+---
+title: "HTTP Protocol & Security Headers"
+description: "Dissect HTTP request/response semantics, methods, status codes, and defensive security headers."
+category: "Web Security"
+order: 1
+published: true
+updatedAt: "2026-10-21"
+difficulty: "Beginner"
+readTime: "7 min read"
+tags: ["web-security", "http", "headers", "csp", "hsts"]
+---
+
+# HTTP Protocol & Security Headers
+
+The Hypertext Transfer Protocol (HTTP) is the foundational application-layer protocol for the World Wide Web. By default, HTTP/1.1 is stateless and cleartext. Securing web applications starts with understanding how client headers, server responses, and modern browser security policies interact.
+
+## Anatomy of an HTTP Request & Response
+
+### HTTP Request
+```http
+POST /api/v1/auth/login HTTP/1.1
+Host: api.cybervault.dev
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64)
+Content-Type: application/json
+Accept: application/json
+Content-Length: 48
+
+{"username":"admin","password":"SamplePassword"}
+```
+
+### HTTP Response
+```http
+HTTP/1.1 200 OK
+Date: Wed, 21 Oct 2026 09:15:00 GMT
+Content-Type: application/json; charset=utf-8
+Set-Cookie: session_id=abc123xyz; Secure; HttpOnly; SameSite=Strict
+Strict-Transport-Security: max-age=63072000; includeSubDomains; preload
+X-Frame-Options: DENY
+X-Content-Type-Options: nosniff
+Content-Security-Policy: default-src 'self'; script-src 'self'
+
+{"status":"authenticated","user_id":42}
+```
+
+## Essential Defensive Security Headers
+
+| Security Header | Purpose | Mitigates |
+| :--- | :--- | :--- |
+| **Content-Security-Policy (CSP)** | Restricts which domains scripts, styles, and images can load from | Cross-Site Scripting (XSS), Data Injection |
+| **Strict-Transport-Security (HSTS)** | Forces browsers to only connect via HTTPS for a specified duration | SSL Stripping, MITM |
+| **X-Frame-Options** | Forbids embedding the site in an `<iframe>` | Clickjacking attacks |
+| **X-Content-Type-Options** | Forces browser to honor the declared MIME type (`nosniff`) | MIME Confusion Attacks |
+| **Referrer-Policy** | Controls how much URL info is leaked in the `Referer` header | Sensitive Token Leakage in URLs |
+
+## Testing Headers with Curl
+
+```bash
+# Fetch response headers only (-I) with verbose status
+curl -I https://cybervault.dev
+```
+
+:::tip
+Always configure `Content-Security-Policy: default-src 'self'`. Avoid using `'unsafe-inline'` or `'unsafe-eval'` in production, as they disable primary XSS protection layers.
+:::

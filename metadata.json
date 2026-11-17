@@ -1,0 +1,6 @@
+{
+  "name": "CyberVault — Cybersecurity Learning & Documentation Platform",
+  "description": "Modern cybersecurity documentation notebook, practical labs, and interactive safe terminal simulator.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

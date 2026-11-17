@@ -1,0 +1,40 @@
+---
+title: "Cookies, Sessions & Storage Security"
+description: "Protect session state against hijacking, configure secure cookie flags, and prevent Cross-Site Scripting."
+category: "Web Security"
+order: 2
+published: true
+updatedAt: "2026-10-21"
+difficulty: "Intermediate"
+readTime: "7 min read"
+tags: ["web-security", "cookies", "sessions", "xss", "csrf"]
+---
+
+# Cookies, Sessions & Storage Security
+
+Because HTTP is inherently stateless, servers issue session tokens to remember authenticated users across requests. Where and how you store these tokens dictates whether your application is vulnerable to session theft.
+
+## The Three Golden Cookie Flags
+
+Whenever a session cookie is set via the `Set-Cookie` header, three security flags should almost always be present:
+
+```http
+Set-Cookie: auth_token=s3cr3t; Secure; HttpOnly; SameSite=Lax; Path=/; Domain=.example.com
+```
+
+### 1. `HttpOnly`
+Prevents client-side scripts from reading `document.cookie`.
+- **Mitigates**: Cross-Site Scripting (XSS) session theft. Even if an attacker executes arbitrary JavaScript on your page, they cannot access an `HttpOnly` session token.
+
+### 2. `Secure`
+Ensures the browser transmits the cookie **only over encrypted TLS/HTTPS connections**. It will never be transmitted over cleartext HTTP, preventing local Wi-Fi eavesdroppers from sniffing the token.
+
+### 3. `SameSite` Attribute
+Controls whether the cookie is sent with cross-site requests:
+- **`Strict`**: Cookie is only sent if the request originates from the exact same site. Highest security for banking and admin portals.
+- **`Lax`**: Cookie is withheld on cross-site subrequests (e.g. images or iframes), but sent when a user navigates to the origin site (e.g. following a link).
+- **`None`**: Cookie is sent on all cross-site requests. **Requires the `Secure` flag**.
+
+:::warning LocalStorage vs. Cookies for JWT Tokens
+Storing sensitive authentication tokens (like OAuth refresh tokens or session JWTs) inside browser `localStorage` or `sessionStorage` is vulnerable: any successful XSS vulnerability can execute `localStorage.getItem('token')` and instantly exfiltrate the user's session. Whenever possible, prefer `HttpOnly`, `Secure`, `SameSite=Strict` cookies.
+:::

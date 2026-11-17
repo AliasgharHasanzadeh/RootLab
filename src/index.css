@@ -1,0 +1,182 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@layer base {
+  :root {
+    --color-electric-blue: #0074fd;
+    --color-neon-cyan: #00b8ff;
+    --color-deep-blue: #0055d4;
+    --color-pure-white: #fdfdfd;
+    --color-midnight-navy: #050b18;
+    --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
+    color-scheme: dark light;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    background: var(--color-pure-white);
+    color: #0b1730;
+  }
+
+  .dark body {
+    background: var(--color-midnight-navy);
+    color: var(--color-pure-white);
+  }
+
+  [dir="rtl"], [dir="rtl"] body {
+    font-family: 'Vazirmatn', var(--font-sans);
+  }
+
+  code, pre, kbd, samp {
+    font-family: var(--font-mono);
+  }
+}
+
+/* Custom scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.25);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(148, 163, 184, 0.4);
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: rgba(71, 85, 105, 0.4);
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: rgba(71, 85, 105, 0.65);
+}
+
+/* Typography & Markdown utilities */
+.prose-vault pre {
+  margin-top: 1.25rem;
+  margin-bottom: 1.25rem;
+}
+
+.prose-vault code {
+  font-size: 0.875em;
+}
+
+/* Glass & subtle card border utilities */
+.border-subtle {
+  border-color: rgba(226, 232, 240, 0.8);
+}
+.dark .border-subtle {
+  border-color: rgba(30, 41, 59, 0.8);
+}
+
+/* RootLab blue system: keeps the existing component structure while giving
+   every view one consistent visual language. */
+@layer utilities {
+  .bg-emerald-400, .bg-emerald-500 { background-color: var(--color-electric-blue) !important; }
+  .hover\:bg-emerald-300:hover { background-color: var(--color-neon-cyan) !important; }
+  .bg-emerald-500\/10 { background-color: color-mix(in srgb, var(--color-electric-blue) 12%, transparent) !important; }
+  .bg-emerald-500\/20 { background-color: color-mix(in srgb, var(--color-neon-cyan) 18%, transparent) !important; }
+  .text-emerald-500, .text-emerald-600, .dark\:text-emerald-400 { color: var(--color-neon-cyan) !important; }
+  .border-emerald-500\/30 { border-color: color-mix(in srgb, var(--color-neon-cyan) 40%, transparent) !important; }
+  .border-emerald-500 { border-color: var(--color-electric-blue) !important; }
+  .ring-emerald-500 { --tw-ring-color: var(--color-electric-blue) !important; }
+  .bg-slate-950 { background-color: var(--color-midnight-navy) !important; }
+  .dark\:bg-slate-950 { background-color: var(--color-midnight-navy) !important; }
+  .dark\:bg-slate-900, .bg-slate-900 { background-color: #09152d !important; }
+  .dark\:bg-slate-800, .bg-slate-800 { background-color: #10244a !important; }
+  .dark\:border-slate-800, .border-slate-800 { border-color: rgba(0, 116, 253, 0.28) !important; }
+  .dark\:border-slate-700 { border-color: rgba(0, 184, 255, 0.35) !important; }
+  .dark\:text-slate-100, .dark\:text-slate-200, .dark\:text-white { color: var(--color-pure-white) !important; }
+  .dark\:text-slate-400, .dark\:text-slate-500 { color: #9ac9ff !important; }
+  .dark\:hover\:text-white:hover { color: var(--color-neon-cyan) !important; }
+  .hover\:bg-slate-900:hover, .dark\:hover\:bg-slate-900:hover { background-color: #10244a !important; }
+  .dark\:hover\:bg-slate-800:hover { background-color: #15366d !important; }
+  .dark\:hover\:bg-slate-700:hover { background-color: #1b4385 !important; }
+  .dark\:border-slate-800\/80 { border-color: rgba(0, 116, 253, 0.34) !important; }
+  .dark\:border-slate-600 { border-color: rgba(0, 184, 255, 0.4) !important; }
+  .dark\:bg-slate-800\/50 { background-color: rgba(16, 36, 74, 0.72) !important; }
+  .dark\:bg-slate-900\/50 { background-color: rgba(9, 21, 45, 0.72) !important; }
+}
+
+@keyframes home-enter-from-top {
+  from {
+    opacity: 0;
+    transform: translateY(-24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.home-enter > * {
+  animation: home-enter-from-top 650ms cubic-bezier(0.2, 0.75, 0.25, 1) both;
+}
+
+.home-enter > *:nth-child(2) {
+  animation-delay: 120ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-enter > * {
+    animation: none;
+  }
+}
+
+@keyframes terminal-typewriter {
+  from { width: 0; }
+  to { width: var(--terminal-width); }
+}
+
+.terminal-typewriter {
+  width: 0;
+  overflow: hidden;
+  animation-name: terminal-typewriter;
+  animation-timing-function: steps(32, end);
+  animation-fill-mode: both;
+}
+
+.terminal-typewriter::after {
+  content: '';
+  display: inline-block;
+  height: 1em;
+  margin-left: 2px;
+  border-right: 1px solid #34d399;
+  vertical-align: -0.12em;
+  animation: terminal-caret 0.8s step-end infinite;
+}
+
+@keyframes ai-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+
+.ai-float {
+  animation: ai-float 1.8s ease-in-out infinite;
+}
+
+@keyframes terminal-caret {
+  50% { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .terminal-typewriter,
+  .terminal-typewriter::after,
+  .ai-float {
+    animation: none;
+  }
+
+  .terminal-typewriter {
+    width: var(--terminal-width);
+  }
+}

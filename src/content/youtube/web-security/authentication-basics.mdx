@@ -1,0 +1,44 @@
+---
+title: "Modern Authentication Architectures"
+description: "Compare password hashing algorithms, multi-factor authentication (MFA), Passkeys/WebAuthn, and JWT security."
+category: "Web Security"
+order: 3
+published: true
+updatedAt: "2026-10-21"
+difficulty: "Intermediate"
+readTime: "8 min read"
+tags: ["web-security", "authentication", "argon2", "jwt", "webauthn"]
+---
+
+# Modern Authentication Architectures
+
+Authentication is the process of verifying that an entity is who they claim to be. Flaws in authentication design allow account takeovers, credential stuffing, and unauthorized privilege escalation.
+
+## Password Storage & Hashing Algorithms
+
+Never store passwords in plaintext or with outdated fast hashing algorithms like MD5 or SHA-1. Modern password hashing algorithms must be **computationally expensive, memory-hard, and salted**.
+
+| Algorithm | Status | Memory Hard? | Recommended Parameters |
+| :--- | :--- | :--- | :--- |
+| **Argon2id** | **Gold Standard (Winner of PHC)** | Yes (Resistant to GPU/ASIC cracking) | $t=3, m=64\text{MB}, p=4$ |
+| **bcrypt** | **Widely Adopted Industry Standard** | No (CPU intensive) | Work factor $\ge 12$ |
+| **scrypt** | **Strong** | Yes | $N=32768, r=8, p=1$ |
+| **SHA-256 / SHA-512** | **BANNED for passwords** | No (GPUs can calculate billions/sec) | Do not use for passwords |
+
+## Salting and Peppering
+- **Salt**: A cryptographically random unique string generated per user and appended to the password before hashing. Prevents rainbow table precomputations.
+- **Pepper**: A secret key stored outside the database (e.g., in a Hardware Security Module or KMS) combined with the hash. If the database leaks alone, the hashes cannot be verified without the pepper.
+
+## JSON Web Tokens (JWT) Pitfalls
+
+A JWT consists of Header, Payload, and Signature:
+
+```text
+eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxMjM0NSJ9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
+[   Header (Base64)  ].[   Payload (Base64)   ].[              Signature               ]
+```
+
+### Critical Security Vulnerabilities in JWT:
+1. **The `none` Algorithm Flaw**: If the verification library accepts `"alg": "none"`, an attacker can modify the payload (e.g., set `"admin": true`) and strip the signature entirely.
+2. **Weak HMAC Secrets**: If using `HS256`, the shared secret key must be at least 256 bits of high entropy. Short dictionary passwords can be cracked offline in seconds with Hashcat.
+3. **Missing Token Invalidation**: Because JWTs are stateless, revoking an active token before expiration requires maintaining a revocation blacklist in Redis.

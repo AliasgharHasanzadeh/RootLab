@@ -1,0 +1,52 @@
+---
+title: "Burp Suite Introduction & Intercept Proxy"
+description: "Configure an HTTP interception proxy, manipulate headers on the fly, and repeat requests with Repeater."
+category: "Security Tools"
+order: 2
+published: true
+updatedAt: "2026-10-21"
+difficulty: "Intermediate"
+readTime: "7 min read"
+tags: ["tools", "burp-suite", "proxy", "web-security", "repeater"]
+---
+
+# Burp Suite Introduction & Intercept Proxy
+
+PortSwigger's Burp Suite is the industry-standard toolkit for web application penetration testing. At its core, Burp Suite acts as an HTTP/HTTPS **Man-in-the-Middle (MitM) proxy** sitting between your browser and the target web server.
+
+## Core Architectural Modules
+
+```text
+[ Browser ] <---> [ 127.0.0.1:8080 (Burp Proxy) ] <---> [ Target Web Server ]
+                               |
+            +------------------+------------------+
+            |                  |                  |
+      [ Intercept ]      [ Repeater ]       [ Intruder ]
+```
+
+1. **Proxy**: Intercepts HTTP/S traffic in real time, allowing manual modification of headers, query parameters, and JSON payloads before they reach the backend.
+2. **Repeater**: Lets you modify individual HTTP requests and resend them repeatedly while watching the response diff.
+3. **Intruder**: Performs automated customized attacks (credential stuffing, directory fuzzing, parameter brute forcing).
+4. **Decoder**: Quickly encodes and decodes URL, Base64, HTML entities, and hex strings.
+5. **Comparer**: Performs visual diffs between two responses (useful for detecting subtle blind SQL injection or timing discrepancies).
+
+## Setting Up the Burp CA Certificate
+
+Because modern web traffic uses TLS encryption, inspecting HTTPS traffic requires installing Burp's custom Certificate Authority (CA) into your browser's trust store:
+
+1. Configure your browser proxy to `127.0.0.1:8080`.
+2. Browse to `http://burp` in your browser.
+3. Click **CA Certificate** to download `cacert.der`.
+4. Import into browser Settings $\to$ Certificates $\to$ "Trust this CA to identify websites".
+
+## Typical Repeater Workflow
+
+1. In the **Proxy History** tab, locate the HTTP request of interest (e.g., `POST /api/transfer`).
+2. Press `Ctrl + R` (or right-click $\to$ "Send to Repeater").
+3. Switch to the **Repeater** tab.
+4. Modify a parameter (e.g., test for IDOR by changing `"account_id": 105` to `"account_id": 104`).
+5. Click **Send** and analyze the server response code and headers.
+
+:::tip Ethics Note
+Always ensure you have explicit written authorization before routing corporate traffic through interception proxies or fuzzing web services.
+:::

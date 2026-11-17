@@ -1,0 +1,60 @@
+---
+title: "Wireshark Packet Analysis Fundamentals"
+description: "Capture network traffic, construct powerful display filters, and reconstruct streams for forensics."
+category: "Security Tools"
+order: 1
+published: true
+updatedAt: "2026-10-21"
+difficulty: "Intermediate"
+readTime: "8 min read"
+tags: ["tools", "wireshark", "pcap", "packet-analysis", "forensics"]
+---
+
+# Wireshark Packet Analysis Fundamentals
+
+Wireshark is the world's premier network protocol analyzer. It lets you see what is happening on your network at a microscopic level. For security analysts, incident responders, and network engineers, analyzing Packet Capture (`.pcap`) files is a vital investigative skill.
+
+## Capture Filters vs. Display Filters
+
+One of the most important concepts to master in Wireshark is the distinction between what you capture and what you view:
+
+| Property | Capture Filters (BPF) | Display Filters |
+| :--- | :--- | :--- |
+| **When Applied** | Before packets are saved to disk | After packets are captured, while browsing |
+| **Syntax Standard** | Berkeley Packet Filter (BPF) syntax | Wireshark proprietary expression syntax |
+| **CPU / Disk Impact** | Lowers memory and storage overhead by discarding unneeded packets early | High fidelity; all packets retained on disk |
+| **Example** | `host 192.168.1.10 and port 80` | `http.request.method == "POST"` |
+
+## Essential Display Filter Cheat Sheet
+
+```text
+# Filter by IP address (either source or destination)
+ip.addr == 192.168.1.50
+
+# Isolate TCP SYN packets (used to spot port scans)
+tcp.flags.syn == 1 and tcp.flags.ack == 0
+
+# Find DNS queries for a specific domain
+dns.qry.name contains "internal.corp"
+
+# Display all HTTP requests with non-standard status codes
+http.response.code >= 400
+
+# Spot suspicious TLS handshakes without SNI header
+tls.handshake.type == 1 and !tls.handshake.extension.type == 0
+```
+
+## Following Streams
+
+Wireshark can reconstruct the fragmented segments of a TCP session into human-readable chronological conversation:
+1. Right-click any packet belonging to the flow.
+2. Select **Follow** $\to$ **TCP Stream** (or HTTP Stream).
+3. Red text indicates traffic sent from the client; blue text indicates the server's reply.
+
+:::warning
+Wireshark captures everything traversing your network interface. In production environments, never run graphical Wireshark as root on production servers. Instead, capture packets with lightweight CLI `tcpdump` and analyze the resulting `.pcap` file offline in a sandboxed workstation:
+
+```bash
+sudo tcpdump -i eth0 -w incident_capture.pcap -c 10000
+```
+:::
